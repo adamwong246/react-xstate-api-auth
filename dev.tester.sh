@@ -1,0 +1,1 @@
+cd tester && yarn test
