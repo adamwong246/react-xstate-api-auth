@@ -2,6 +2,26 @@ class AuthService {
   constructor({ config, validators }) {
     this.config = config;
     this.validators = validators;
+
+    if (typeof sessionStorage !== 'undefined') {
+      this.store = sessionStorage;
+    } else {
+
+      this.store = {
+        storage: {},
+
+        setItem: (key, value) => {
+          this.store.storage[key] = value;
+        },
+        getItem: (key) => {
+          return this.store.storage[key];
+        },
+        clear: () => {
+          this.store.storage = {};
+        }
+      };
+    }
+
   }
 
   _validateStringField(field, value) {
@@ -16,22 +36,22 @@ class AuthService {
 
   _userId(userId) {
     if (typeof userId !== 'undefined') {
-      sessionStorage.setItem('userId', userId);
+      this.store.setItem('userId', userId);
 
       return;
     }
 
-    return sessionStorage.getItem('userId');
+    return this.store.getItem('userId');
   }
 
   _token(token) {
     if (typeof token !== 'undefined') {
-      sessionStorage.setItem('token', token);
+      this.store.setItem('token', token);
 
       return;
     }
 
-    return sessionStorage.getItem('token');
+    return this.store.getItem('token');
   }
 
   isLoggedIn() {
@@ -47,12 +67,12 @@ class AuthService {
       this._validateStringField('password', password);
 
       return fetch(`${this.config.get('API_URL')}/register`, {
-        method: 'POST',
-        body: JSON.stringify({ name, email, password }),
-        headers: {
-          'content-type': 'application/json'
-        }
-      })
+          method: 'POST',
+          body: JSON.stringify({ name, email, password }),
+          headers: {
+            'content-type': 'application/json'
+          }
+        })
         .then(res => {
           if (res.status === 201) {
             return res;
@@ -77,12 +97,12 @@ class AuthService {
       this._validateStringField('password', password);
 
       return fetch(`${API_URL}/authenticate`, {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-        headers: {
-          'content-type': 'application/json'
-        }
-      })
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+          headers: {
+            'content-type': 'application/json'
+          }
+        })
         .then(res => {
           if (res.status === 200) {
             return res;
@@ -107,7 +127,7 @@ class AuthService {
       delete this.token;
       delete this.userId;
 
-      sessionStorage.clear();
+      this.store.clear();
     });
   }
 
@@ -115,12 +135,12 @@ class AuthService {
     const API_URL = this.config.get('API_URL');
 
     return fetch(`${API_URL}/user/${this._userId()}`, {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${this._token()}`
-      }
-    })
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${this._token()}`
+        }
+      })
       .then(res => {
         if (res.status === 200) {
           return res;
@@ -134,5 +154,6 @@ class AuthService {
       .then(({ user }) => user);
   }
 }
+
 
 export default AuthService;

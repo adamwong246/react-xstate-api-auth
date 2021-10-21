@@ -1,4 +1,4 @@
-import { Machine, assign } from 'xstate';
+import { createMachine, Machine, assign } from 'xstate';
 import STATES from './states';
 import EVENTS from './events';
 

@@ -2,9 +2,13 @@
   "name": "tester",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "built/index.js",
+  "type": "module",
   "scripts": {
-    "test": "tsc"
+    "clean": "rm -rf built",
+    "transpile": "tsc",
+    "test": "node --es-module-specifier-resolution=node built/tester/src/index.js",
+    "doIt": "yarn clean && yarn transpile && yarn test"
   },
   "keywords": [],
   "author": "",
@@ -13,10 +17,13 @@
     "body-parser": "^1.18.3",
     "cors": "^2.8.4",
     "dotenv": "^6.0.0",
+    "esm": "^3.2.25",
     "express": "^4.16.3",
     "jsonwebtoken": "^8.3.0",
+    "map-tree": "^1.1.1",
     "mongodb": "^3.1.4",
     "mongoose": "^5.2.14",
-    "typescript": "^4.4.2"
+    "typescript": "^4.4.2",
+    "xstate": "^4.23.4"
   }
 }
